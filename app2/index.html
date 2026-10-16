@@ -7,131 +7,154 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 :root{
-  --bg:#141716;--card:#1f2321;--card2:#272c29;--line:#323835;--text:#f2f4f3;--muted:#9aa29e;
-  --green:#6aaa3a;--green2:#7fbf4c;--red:#ef7474;--blue:#4f7cff;--gold:#e9b949;
+  --sand:#f5efe3;--paper:#fffaf1;--ink:#16324a;--ink2:#4c6274;--line:#e4dccb;
+  --copper:#c8702a;--copper-soft:#f3dcc4;--olive:#5d7d36;--olive-soft:#e4ecd5;
+  --red:#c0453b;--red-soft:#f6dcd8;--sea:#1f5b85;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:16px}
-body{padding:0 16px calc(24px + env(safe-area-inset-bottom))}
-button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+html,body{margin:0;background:var(--sand);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:16px}
+body{padding:0 18px calc(28px + env(safe-area-inset-bottom))}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;text-align:left}
 .hidden{display:none!important}
-h1{font-size:30px;margin:18px 0 4px;letter-spacing:-.5px}
-h2{font-size:21px;margin:22px 0 12px}
-.sub{color:var(--muted);margin:0 0 6px;font-size:15px}
-.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.days{background:var(--blue);border-radius:14px;padding:8px 12px;text-align:center;line-height:1;flex-shrink:0;margin-top:18px}
-.days b{display:block;font-size:26px}.days span{font-size:13px}
-.hero{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:linear-gradient(135deg,var(--green),var(--green2));border-radius:20px;padding:18px;margin-top:8px;box-shadow:0 4px 0 #4d7f28}
-.hero .ic{width:52px;height:52px;border-radius:14px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:26px;flex-shrink:0}
-.hero b{display:block;font-size:20px}.hero small{opacity:.9;font-size:14px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-.mini{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;text-align:left}
-.mini b{display:block;font-size:16px;margin:8px 0 2px}.mini small{color:var(--muted);font-size:13px}
-.ready{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;align-items:center;gap:16px;margin-top:12px}
-.ring{width:84px;height:84px;flex-shrink:0;position:relative}
-.ring svg{transform:rotate(-90deg)}
-.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:20px;color:var(--red)}
-.ready p{margin:0;color:var(--muted);font-size:14px;line-height:1.4}
-.ready p strong{color:var(--text)}
-.cat{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px}
-.cat .ic{width:44px;height:44px;border-radius:12px;background:var(--card2);display:grid;place-items:center;font-size:22px;flex-shrink:0}
-.cat .mid{flex:1;min-width:0}
-.cat b{display:block;font-size:16px}.cat small{color:var(--muted);font-size:13px}
-.bar{height:8px;background:var(--card2);border-radius:8px;overflow:hidden;margin-top:8px}
-.bar i{display:block;height:100%;background:var(--green);border-radius:8px;transition:width .3s}
-.pct{font-weight:700;color:var(--muted);font-size:15px}
+.serif{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif}
+
+/* header */
+.eyebrow{margin:22px 0 6px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--copper);font-weight:700}
+h1{font-size:31px;line-height:1.1;margin:0;font-weight:700}
+.meta{display:flex;align-items:center;gap:8px;margin:12px 0 0;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13.5px;color:var(--ink2)}
+.chip b{color:var(--ink)}
+
+/* progress panel */
+.panel{background:var(--ink);color:#fff;border-radius:22px;padding:18px 18px 16px;margin-top:18px;position:relative;overflow:hidden}
+.panel::after{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;border:22px solid rgba(255,255,255,.06)}
+.panel .lbl{font-size:13px;opacity:.75;letter-spacing:.3px}
+.panel .num{display:flex;align-items:baseline;gap:10px;margin:4px 0 12px}
+.panel .num b{font-size:44px;line-height:1}
+.panel .num span{opacity:.75;font-size:14px}
+.track{height:10px;background:rgba(255,255,255,.14);border-radius:10px;overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--copper);border-radius:10px;transition:width .4s}
+.marks{display:flex;justify-content:space-between;font-size:11.5px;opacity:.7;margin-top:6px}
+
+/* actions */
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.act{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:14px 10px;text-align:center}
+.act .i{width:42px;height:42px;margin:0 auto 8px;border-radius:50%;display:grid;place-items:center;font-size:20px}
+.act b{display:block;font-size:14px}
+.act small{display:block;color:var(--ink2);font-size:12px;margin-top:2px}
+.act.main{background:var(--copper);border-color:var(--copper);color:#fff}
+.act.main .i{background:rgba(255,255,255,.2)}
+.act.main small{color:rgba(255,255,255,.85)}
+
+/* topics grid */
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:26px 0 12px}
+.sec h2{font-size:22px;margin:0}
+.sec span{font-size:13px;color:var(--ink2)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;min-height:132px;position:relative}
+.tile .em{font-size:26px}
+.tile b{font-size:14.5px;line-height:1.25;margin-top:auto;padding-top:10px}
+.tile small{color:var(--ink2);font-size:12px;margin-top:4px}
+.tile .rg{position:absolute;top:12px;right:12px;width:38px;height:38px}
+.tile .rg svg{transform:rotate(-90deg)}
+.tile .rg span{position:absolute;inset:0;display:grid;place-items:center;font-size:10.5px;font-weight:700;color:var(--ink2)}
+.tile.done{border-color:var(--olive);background:var(--olive-soft)}
+.reset{display:block;margin:24px auto 0;color:var(--ink2);font-size:13px;text-decoration:underline;text-align:center}
+
 /* quiz */
-.qhead{display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px;color:var(--muted);font-size:14px}
-.qhead .x{font-size:22px;padding:4px 8px;margin-left:-8px}
-.timer{font-variant-numeric:tabular-nums;font-weight:700;color:var(--text)}
-.prog{height:6px;background:var(--card2);border-radius:6px;overflow:hidden;margin-bottom:18px}
-.prog i{display:block;height:100%;background:var(--blue);transition:width .25s}
-.qtext{font-size:19px;font-weight:650;line-height:1.35;margin:0 0 8px}
-.qru{color:var(--muted);font-size:15px;line-height:1.35;margin:0 0 18px}
-.opt{display:block;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:16px;padding:13px 14px;margin-bottom:10px;line-height:1.35}
-.opt .l{display:inline-block;width:24px;color:var(--muted);font-weight:700}
-.opt small{display:block;color:var(--muted);font-size:13.5px;margin:3px 0 0 24px}
-.opt.sel{border-color:var(--blue)}
-.opt.ok{border-color:var(--green);background:rgba(106,170,58,.14)}
-.opt.bad{border-color:var(--red);background:rgba(239,116,116,.12)}
-.expl{background:var(--card2);border-radius:16px;padding:14px;margin:6px 0 14px;font-size:15px;line-height:1.45}
+.qbar{display:flex;align-items:center;gap:12px;margin:16px 0 18px}
+.qbar .x{width:36px;height:36px;border-radius:50%;background:var(--paper);border:1px solid var(--line);display:grid;place-items:center;font-size:16px;flex-shrink:0;text-align:center}
+.qbar .prog{flex:1;height:8px;background:var(--line);border-radius:8px;overflow:hidden}
+.qbar .prog i{display:block;height:100%;background:var(--sea);transition:width .25s}
+.qbar .cnt{font-size:13px;color:var(--ink2);font-variant-numeric:tabular-nums;min-width:44px;text-align:right}
+.timer{font-weight:700;color:var(--ink)}
+.qtopic{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--copper);font-weight:700;margin-bottom:8px}
+.qtext{font-size:21px;font-weight:700;line-height:1.3;margin:0 0 8px}
+.qru{color:var(--ink2);font-size:15px;line-height:1.4;margin:0}
+.toggle{font-size:13px;color:var(--sea);padding:8px 0 14px;text-decoration:underline}
+.opt{display:flex;align-items:flex-start;gap:12px;width:100%;background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:12px;margin-bottom:9px;line-height:1.35}
+.opt .l{width:28px;height:28px;border-radius:50%;background:var(--sand);display:grid;place-items:center;font-weight:700;font-size:14px;flex-shrink:0;color:var(--ink2)}
+.opt .t{padding-top:3px}
+.opt small{display:block;color:var(--ink2);font-size:13.5px;margin-top:3px}
+.opt.sel{border-color:var(--sea);box-shadow:0 0 0 3px rgba(31,91,133,.12)}
+.opt.sel .l{background:var(--sea);color:#fff}
+.opt.ok{border-color:var(--olive);background:var(--olive-soft)}
+.opt.ok .l{background:var(--olive);color:#fff}
+.opt.bad{border-color:var(--red);background:var(--red-soft)}
+.opt.bad .l{background:var(--red);color:#fff}
+.expl{border-left:4px solid var(--copper);background:var(--paper);border-radius:0 14px 14px 0;padding:12px 14px;margin:8px 0 14px;font-size:15px;line-height:1.45}
 .expl b{display:block;margin-bottom:4px}
-.btn{display:block;width:100%;background:var(--green);border-radius:16px;padding:15px;font-weight:700;font-size:17px;text-align:center;box-shadow:0 3px 0 #4d7f28}
-.btn.alt{background:var(--card2);box-shadow:none}
-.btn:disabled{opacity:.4}
-.toggle{font-size:13px;color:var(--blue);padding:0;margin:-4px 0 14px}
+.btn{display:block;width:100%;background:var(--ink);color:#fff;border-radius:14px;padding:15px;font-weight:700;font-size:16.5px;text-align:center}
+.btn:disabled{opacity:.35}
+.foot{position:sticky;bottom:0;padding:10px 0 calc(6px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--sand) 70%,rgba(245,239,227,0))}
+
 /* result */
-.res{text-align:center;padding-top:30px}
-.res .big{font-size:56px;font-weight:800;margin:10px 0 0}
-.res .verdict{font-size:18px;margin:6px 0 4px}
-.res p{color:var(--muted)}
-.review{text-align:left;margin-top:20px}
-.rv{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px;font-size:14px;line-height:1.4}
-.rv .g{color:var(--green)}.rv .r{color:var(--red)}
-.empty{color:var(--muted);text-align:center;padding:40px 10px}
-.reset{display:block;margin:22px auto 0;color:var(--muted);font-size:13px;text-decoration:underline}
+.res{padding-top:28px}
+.score{background:var(--ink);color:#fff;border-radius:22px;padding:22px;text-align:center}
+.score .big{font-size:54px;font-weight:800;line-height:1;margin:8px 0}
+.score .verdict{font-size:17px;font-weight:600}
+.score p{opacity:.75;font-size:14px;margin:8px 0 0}
+.review h2{font-size:20px;margin:24px 0 10px}
+.rv{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px;font-size:14px;line-height:1.4}
+.rv .g{color:var(--olive);font-weight:600}.rv .r{color:var(--red)}
+.rv .m{color:var(--ink2)}
 </style>
 </head>
 <body>
 
 <!-- HOME -->
 <section id="home">
-  <div class="top">
-    <div>
-      <h1>Cyprus Exam Prep</h1>
-      <p class="sub">История, культура и государство Кипра</p>
-    </div>
-    <div class="days" id="days"><b>–</b><span>дней</span></div>
+  <div class="eyebrow">Κύπρος · экзамен по культуре</div>
+  <h1 class="serif">Кипр: история, культура и государство</h1>
+  <div class="meta">
+    <span class="chip">📅 до экзамена <b id="days">–</b></span>
+    <span class="chip">📚 <b id="totalQ">0</b> вопросов</span>
   </div>
 
-  <button class="hero" id="startAll">
-    <div class="ic">🎓</div>
-    <div style="flex:1"><b>Тренировка</b><small>Вопросы из всех тем</small></div>
-    <div style="font-size:24px">›</div>
-  </button>
-
-  <div class="row2">
-    <button class="mini" id="startExam"><div style="font-size:22px">⏱️</div><b>Пробный экзамен</b><small>25 вопросов · 45 мин</small></button>
-    <button class="mini" id="startMist"><div style="font-size:22px">🔁</div><b>Мои ошибки</b><small id="mistCount">0 вопросов</small></button>
+  <div class="panel">
+    <div class="lbl">Готовность к экзамену</div>
+    <div class="num"><b id="readyPct">0%</b><span id="readyTxt"></span></div>
+    <div class="track"><i id="readyBar"></i></div>
+    <div class="marks"><span>0%</span><span>цель — 60%+ верных ответов</span><span>100%</span></div>
   </div>
 
-  <div class="ready">
-    <div class="ring">
-      <svg width="84" height="84"><circle cx="42" cy="42" r="35" fill="none" stroke="#272c29" stroke-width="9"/><circle id="ringArc" cx="42" cy="42" r="35" fill="none" stroke="#ef7474" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 220"/></svg>
-      <b id="readyPct">0%</b>
-    </div>
-    <p><strong>Готовность к экзамену</strong><br><span id="readyTxt"></span></p>
+  <div class="actions">
+    <button class="act main" id="startAll"><div class="i">▶</div><b>Учить</b><small>15 вопросов</small></button>
+    <button class="act" id="startExam"><div class="i" style="background:var(--copper-soft)">⏱</div><b>Экзамен</b><small>25 · 45 мин</small></button>
+    <button class="act" id="startMist"><div class="i" style="background:var(--red-soft)">↻</div><b>Ошибки</b><small id="mistCount">0</small></button>
   </div>
 
-  <h2>Темы</h2>
-  <div id="cats"></div>
+  <div class="sec"><h2 class="serif">Темы</h2><span>выберите тему</span></div>
+  <div class="grid" id="cats"></div>
   <button class="reset" id="resetBtn">Сбросить прогресс</button>
 </section>
 
 <!-- QUIZ -->
 <section id="quiz" class="hidden">
-  <div class="qhead">
+  <div class="qbar">
     <button class="x" id="quit">✕</button>
-    <span id="qTitle"></span>
-    <span id="qCount"></span>
+    <div class="prog"><i id="qProg"></i></div>
+    <span class="cnt" id="qCount"></span>
   </div>
-  <div class="prog"><i id="qProg"></i></div>
-  <p class="qtext" id="qText"></p>
+  <div class="qtopic" id="qTitle"></div>
+  <p class="qtext serif" id="qText"></p>
   <p class="qru" id="qRu"></p>
   <button class="toggle" id="trToggle"></button>
   <div id="opts"></div>
   <div class="expl hidden" id="expl"></div>
-  <button class="btn" id="next" disabled>Ответить</button>
+  <div class="foot"><button class="btn" id="next" disabled>Ответить</button></div>
 </section>
 
 <!-- RESULT -->
 <section id="result" class="hidden">
   <div class="res">
-    <div style="font-size:44px" id="resEmoji"></div>
-    <div class="big" id="resScore"></div>
-    <div class="verdict" id="resVerdict"></div>
-    <p id="resNote"></p>
-    <button class="btn" id="resHome" style="margin-top:20px">На главную</button>
+    <div class="score">
+      <div style="font-size:36px" id="resEmoji"></div>
+      <div class="big" id="resScore"></div>
+      <div class="verdict" id="resVerdict"></div>
+      <p id="resNote"></p>
+    </div>
+    <button class="btn" id="resHome" style="margin-top:14px;background:var(--copper)">На главную</button>
     <div class="review" id="review"></div>
   </div>
 </section>
@@ -157,7 +180,7 @@ var LETTERS = ['α','β','γ','δ'];
 var KEY = 'cy-exam-v1';
 
 var tg = window.Telegram && Telegram.WebApp;
-try { tg.ready(); tg.expand(); tg.setHeaderColor('#141716'); tg.setBackgroundColor('#141716'); } catch(e) {}
+try { tg.ready(); tg.expand(); tg.setHeaderColor('#f5efe3'); tg.setBackgroundColor('#f5efe3'); } catch(e) {}
 function haptic(t){ try{ tg.HapticFeedback.notificationOccurred(t); }catch(e){} }
 
 /* progress: {id: 1 = last answer correct, 0 = last answer wrong} */
@@ -165,37 +188,41 @@ var state = {p:{}, tr:true};
 try { var s = JSON.parse(localStorage.getItem(KEY)); if (s && s.p) state = s; } catch(e) {}
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
 
-var byId = {}; BANK.qs.forEach(function(q){ byId[q.id]=q; });
 function qsFor(cat){ return BANK.qs.filter(function(q){ return cat.ch.indexOf(q.ch)>=0; }); }
+function catOf(q){ for(var i=0;i<CATS.length;i++) if(CATS[i].ch.indexOf(q.ch)>=0) return CATS[i]; return null; }
 function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t;} return a; }
 function $(id){ return document.getElementById(id); }
 function show(id){ ['home','quiz','result'].forEach(function(s){ $(s).classList.toggle('hidden', s!==id); }); window.scrollTo(0,0);
   try{ if(id==='home') tg.BackButton.hide(); else tg.BackButton.show(); }catch(e){} }
 function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function plural(n,a,b,c){ var m=n%10, h=n%100; if(m===1&&h!==11) return a; if(m>=2&&m<=4&&(h<12||h>14)) return b; return c; }
 
 /* ---------- home ---------- */
 function renderHome(){
   var days = Math.max(0, Math.ceil((EXAM_DATE - new Date())/86400000));
-  $('days').innerHTML = '<b>'+days+'</b><span>дней</span>';
+  $('days').textContent = days+' '+plural(days,'день','дня','дней');
   var total = BANK.qs.length, done = 0;
   BANK.qs.forEach(function(q){ if(state.p[q.id]===1) done++; });
+  $('totalQ').textContent = total;
   var pct = Math.round(done/total*100);
   $('readyPct').textContent = pct+'%';
-  $('ringArc').setAttribute('stroke-dasharray', (220*pct/100)+' 220'); $('ringArc').style.opacity = pct>0 ? 1 : 0;
-  var color = pct>=60 ? '#6aaa3a' : pct>=30 ? '#e9b949' : '#ef7474';
-  $('ringArc').setAttribute('stroke', color); $('readyPct').style.color = color;
-  $('readyTxt').textContent = 'Правильно отвечено: '+done+' из '+total+' вопросов. Экзамен: 21 ноября 2026.';
+  $('readyBar').style.width = pct+'%';
+  $('readyTxt').textContent = done+' из '+total+' верно';
   var mist = BANK.qs.filter(function(q){ return state.p[q.id]===0; }).length;
-  $('mistCount').textContent = mist + ' ' + plural(mist,'вопрос','вопроса','вопросов');
+  $('mistCount').textContent = mist ? mist+' '+plural(mist,'вопрос','вопроса','вопросов') : 'пока нет';
   var html='';
   CATS.forEach(function(c){
     var list = qsFor(c), ok = list.filter(function(q){ return state.p[q.id]===1; }).length;
-    var p = Math.round(ok/list.length*100);
-    html += '<button class="cat" data-cat="'+c.id+'"><div class="ic">'+c.ic+'</div><div class="mid"><b>'+esc(c.name)+'</b><small>'+ok+' / '+list.length+' '+plural(list.length,'вопрос','вопроса','вопросов')+'</small><div class="bar"><i style="width:'+p+'%"></i></div></div><span class="pct">'+p+'%</span></button>';
+    var p = Math.round(ok/list.length*100), C = 2*Math.PI*15;
+    html += '<button class="tile'+(p===100?' done':'')+'" data-cat="'+c.id+'">'+
+      '<span class="em">'+c.ic+'</span>'+
+      '<span class="rg"><svg width="38" height="38"><circle cx="19" cy="19" r="15" fill="none" stroke="#e4dccb" stroke-width="4"/>'+
+      (p>0?'<circle cx="19" cy="19" r="15" fill="none" stroke="'+(p===100?'#5d7d36':'#c8702a')+'" stroke-width="4" stroke-linecap="round" stroke-dasharray="'+(C*p/100)+' '+C+'"/>':'')+
+      '</svg><span>'+p+'%</span></span>'+
+      '<b>'+esc(c.name)+'</b><small>'+ok+' / '+list.length+'</small></button>';
   });
   $('cats').innerHTML = html;
 }
-function plural(n,a,b,c){ var m=n%10, h=n%100; if(m===1&&h!==11) return a; if(m>=2&&m<=4&&(h<12||h>14)) return b; return c; }
 
 /* ---------- quiz ---------- */
 var run = null;
@@ -216,9 +243,9 @@ function tick(){
 function renderQ(){
   var q = run.list[run.i];
   run.picked = null; run.revealed = false;
-  $('qTitle').textContent = run.title;
+  var c = catOf(q);
+  $('qTitle').textContent = run.exam ? 'Экзамен · вопрос '+(run.i+1)+' из '+run.list.length : (c ? c.name : run.title);
   if(!run.exam) $('qCount').textContent = (run.i+1)+' / '+run.list.length;
-  else $('qTitle').textContent = 'Вопрос '+(run.i+1)+' / '+run.list.length;
   $('qProg').style.width = (run.i/run.list.length*100)+'%';
   $('qText').textContent = q.q;
   $('qRu').textContent = q.ru;
@@ -227,7 +254,7 @@ function renderQ(){
   var html='';
   q.o.forEach(function(o,k){
     var ru = (state.tr && q.ro && q.ro[k]) ? '<small>'+esc(q.ro[k])+'</small>' : '';
-    html += '<button class="opt" data-k="'+k+'"><span class="l">'+LETTERS[k]+'</span>'+esc(o)+ru+'</button>';
+    html += '<button class="opt" data-k="'+k+'"><span class="l">'+LETTERS[k]+'</span><span class="t">'+esc(o)+ru+'</span></button>';
   });
   $('opts').innerHTML = html;
   $('expl').classList.add('hidden');
@@ -256,7 +283,7 @@ function onNext(){
       b.classList.remove('sel');
       if(i===q.a) b.classList.add('ok'); else if(i===run.picked) b.classList.add('bad');
     });
-    $('expl').innerHTML = '<b style="color:'+(ok?'var(--green)':'var(--red)')+'">'+(ok?'Верно!':'Неверно. Правильный ответ: '+LETTERS[q.a])+'</b>'+esc(q.e);
+    $('expl').innerHTML = '<b style="color:'+(ok?'var(--olive)':'var(--red)')+'">'+(ok?'Верно!':'Неверно. Правильный ответ: '+LETTERS[q.a])+'</b>'+esc(q.e);
     $('expl').classList.remove('hidden');
     $('next').textContent = run.i===run.list.length-1 ? 'Результат' : 'Следующий вопрос';
     return;
@@ -272,24 +299,23 @@ function finish(){
   var n = r.list.length;
   $('resScore').textContent = right+' / '+n;
   if(r.title==='Пробный экзамен'){
-    var verdict = right>=15 ? 'Сдано: гражданство и ПМЖ' : right>=13 ? 'Сдано для ПМЖ (для гражданства нужно 15)' : 'Пока не сдано';
-    $('resVerdict').textContent = verdict;
+    $('resVerdict').textContent = right>=15 ? 'Сдано: гражданство и ПМЖ' : right>=13 ? 'Сдано для ПМЖ (для гражданства нужно 15)' : 'Пока не сдано';
     $('resEmoji').textContent = right>=15 ? '🏆' : right>=13 ? '👍' : '📚';
     $('resNote').textContent = 'Проходной балл: 13 для ПМЖ, 15 для гражданства.';
   } else {
     var p = Math.round(right/n*100);
     $('resVerdict').textContent = p>=80 ? 'Отлично!' : p>=50 ? 'Хороший результат' : 'Есть над чем поработать';
     $('resEmoji').textContent = p>=80 ? '🌟' : p>=50 ? '💪' : '📚';
-    $('resNote').textContent = 'Ошибки сохранены в разделе «Мои ошибки».';
+    $('resNote').textContent = 'Ошибки сохранены в разделе «Ошибки».';
   }
   var html = '';
   r.list.forEach(function(q,i){
     var a = r.answers[i]; if(a===q.a) return;
-    html += '<div class="rv"><div>'+esc(q.q)+'</div><div style="color:var(--muted)">'+esc(q.ru)+'</div>'+
-      (a!=null && a!==undefined ? '<div class="r">✗ '+LETTERS[a]+') '+esc(q.o[a])+'</div>' : '<div class="r">✗ нет ответа</div>')+
-      '<div class="g">✓ '+LETTERS[q.a]+') '+esc(q.o[q.a])+'</div><div style="color:var(--muted);margin-top:4px">'+esc(q.e)+'</div></div>';
+    html += '<div class="rv"><div><b>'+esc(q.q)+'</b></div><div class="m">'+esc(q.ru)+'</div>'+
+      (a!=null ? '<div class="r">✗ '+LETTERS[a]+') '+esc(q.o[a])+'</div>' : '<div class="r">✗ нет ответа</div>')+
+      '<div class="g">✓ '+LETTERS[q.a]+') '+esc(q.o[q.a])+'</div><div class="m" style="margin-top:4px">'+esc(q.e)+'</div></div>';
   });
-  $('review').innerHTML = html ? '<h2>Разбор ошибок</h2>'+html : '';
+  $('review').innerHTML = html ? '<h2 class="serif">Разбор ошибок</h2>'+html : '';
   run = null;
   show('result');
 }
@@ -304,15 +330,18 @@ function buildExam(){
 
 /* ---------- events ---------- */
 $('cats').addEventListener('click', function(e){
-  var b = e.target.closest('.cat'); if(!b) return;
+  var b = e.target.closest('.tile'); if(!b) return;
   var c = CATS.filter(function(x){ return x.id===b.dataset.cat; })[0];
-  // unanswered and wrong first, then the rest
   var list = qsFor(c);
   var todo = shuffle(list.filter(function(q){ return state.p[q.id]!==1; }));
   var rest = shuffle(list.filter(function(q){ return state.p[q.id]===1; }));
   startRun(c.name, todo.concat(rest).slice(0, 15));
 });
-$('startAll').onclick = function(){ startRun('Тренировка', shuffle(BANK.qs.filter(function(q){ return state.p[q.id]!==1; })).concat(shuffle(BANK.qs)).slice(0,15)); };
+$('startAll').onclick = function(){
+  var todo = shuffle(BANK.qs.filter(function(q){ return state.p[q.id]!==1; }));
+  var rest = shuffle(BANK.qs.filter(function(q){ return state.p[q.id]===1; }));
+  startRun('Тренировка', todo.concat(rest).slice(0,15));
+};
 $('startExam').onclick = function(){ startRun('Пробный экзамен', buildExam(), true); };
 $('startMist').onclick = function(){
   var l = BANK.qs.filter(function(q){ return state.p[q.id]===0; });
@@ -323,13 +352,12 @@ $('opts').addEventListener('click', function(e){ var b=e.target.closest('.opt');
 $('next').onclick = onNext;
 $('trToggle').onclick = function(){
   state.tr = !state.tr; save();
-  var q = run.list[run.i], picked = run.picked, revealed = run.revealed;
-  if(revealed){ // keep the revealed state, just toggle text
+  if(run.revealed){
     $('qRu').classList.toggle('hidden', !state.tr);
     $('trToggle').textContent = state.tr ? 'Скрыть перевод' : 'Показать перевод';
     return;
   }
-  renderQ(); if(picked!==null) pick(picked);
+  var picked = run.picked; renderQ(); if(picked!==null) pick(picked);
 };
 function goHome(){ run=null; renderHome(); show('home'); }
 $('quit').onclick = function(){ if(!run || run.i===0 || confirm('Выйти? Прогресс по отвеченным вопросам сохранён.')) goHome(); };
