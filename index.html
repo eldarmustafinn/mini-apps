@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Mini Apps</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 16px; margin: 0;
+           background: var(--tg-theme-bg-color, #fff);
+           color: var(--tg-theme-text-color, #000); }
+    a { display: block; padding: 16px; margin-bottom: 12px;
+        border-radius: 12px; text-decoration: none;
+        background: var(--tg-theme-button-color, #2481cc);
+        color: var(--tg-theme-button-text-color, #fff); }
+  </style>
+</head>
+<body>
+  <h2>My Mini Apps</h2>
+  <a href="./app1/">App 1</a>
+  <script>Telegram.WebApp.ready(); Telegram.WebApp.expand();</script>
+</body>
+</html>
