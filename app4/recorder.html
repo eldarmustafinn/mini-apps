@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Anna's Library Recorder</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+<style>
+  :root{
+    --bg:#0b1424; --card:#14223a; --line:#22314d; --chip:#1b2840; --text:#f3f5fa; --muted:#9aa7bf;
+    --gold:#f7c23b; --rec:#e5484d; --ok:#2fbf71;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Outfit',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  header{background:radial-gradient(90% 140% at 85% 0%,#5a3716 0%,#13223d 55%,var(--bg) 100%);border-bottom:1px solid var(--line);
+         padding:22px max(16px,env(safe-area-inset-left)) 18px}
+  header h1{font-size:28px;font-weight:800;line-height:1.1}
+  header h1 span{color:var(--gold)}
+  header p{color:var(--muted);font-weight:500;margin-top:6px;font-size:15px}
+  .wrap{display:grid;grid-template-columns:260px 1fr;gap:20px;max-width:1100px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-left))}
+  @media(max-width:760px){.wrap{grid-template-columns:1fr}}
+  .list{display:flex;flex-direction:column;gap:8px}
+  .item{display:flex;align-items:center;gap:10px;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px 12px;cursor:pointer;font:inherit;text-align:left;color:inherit}
+  .item.sel{border-color:var(--gold);box-shadow:0 0 0 3px rgba(247,194,59,.15)}
+  .item .n{width:30px;height:30px;border-radius:50%;color:#fff;font-weight:800;display:grid;place-items:center;flex-shrink:0;font-size:14px}
+  .item b{font-size:14px;line-height:1.2;flex:1;min-width:0;font-weight:600}
+  .item b.untitled{color:var(--muted);font-weight:500}
+  .item .st{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+  .item .st.done{color:var(--ok)}
+  .main{min-width:0}
+  .bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:6px 0 12px;display:flex;flex-direction:column;gap:10px}
+  .title{font-family:'Libre Baskerville',serif;font-size:22px;line-height:1.25}
+  .controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+  button.btn{font:inherit;font-weight:700;font-size:16px;border:none;border-radius:14px;padding:12px 18px;cursor:pointer;color:#fff;background:var(--chip);display:inline-flex;align-items:center;gap:8px}
+  button.btn:disabled{opacity:.35;cursor:default}
+  button.rec{background:var(--rec)}
+  button.ok{background:var(--gold);color:#1a1a1a}
+  .dot{width:12px;height:12px;border-radius:50%;background:#fff}
+  .recording .dot{animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:.2}}
+  .timer{font-variant-numeric:tabular-nums;font-weight:800;font-size:18px;min-width:56px}
+  .msg{font-weight:500;font-size:14px;color:var(--muted)}
+  .msg.err{color:#ff7a7e}
+  audio{width:100%;max-width:520px;height:40px}
+  .level{height:8px;width:160px;background:var(--line);border-radius:8px;overflow:hidden}
+  .level i{display:block;height:100%;width:0;background:var(--ok);transition:width .08s}
+  .size{display:flex;align-items:center;gap:6px;font-weight:600;font-size:13px;color:var(--muted)}
+  .size button{font:inherit;font-weight:800;border:1px solid var(--line);background:var(--chip);border-radius:10px;width:34px;height:30px;cursor:pointer;color:var(--text)}
+  .text{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 24px;font-size:var(--fs,24px);line-height:1.6;font-weight:500;max-width:70ch;color:#e6ebf4}
+  .text p{margin-bottom:.7em}
+  .text .empty{color:var(--muted);font-size:17px;line-height:1.5}
+  .text code{background:var(--chip);padding:1px 6px;border-radius:6px;font-size:.9em}
+  .tip{margin-top:14px;font-size:14px;color:var(--muted);line-height:1.5;max-width:70ch}
+</style>
+</head>
+<body>
+<header>
+  <h1>Anna's <span>Library</span> · Recorder</h1>
+  <p>Pick a book, press Record and read the text. The finished file downloads with the right name.</p>
+</header>
+<div class="wrap">
+  <nav class="list" id="list"></nav>
+  <main class="main">
+    <div class="bar">
+      <div class="title" id="title"></div>
+      <div class="controls">
+        <button class="btn rec" id="recBtn"><span class="dot"></span><span id="recLabel">Record</span></button>
+        <span class="timer" id="timer">0:00</span>
+        <span class="level"><i id="level"></i></span>
+        <button class="btn ok" id="dlBtn" disabled>⬇ Download <span id="fname">01.mp3</span></button>
+        <span class="size">Text <button id="smaller">A−</button><button id="bigger">A+</button></span>
+      </div>
+      <audio id="player" controls hidden></audio>
+      <div class="msg" id="msg">Allow microphone access when the browser asks.</div>
+    </div>
+    <div class="text" id="text"></div>
+    <p class="tip">Tip: read slowly with pauses, in a quiet room, keeping the same distance from the mic. Made a mistake? Just press Record again and the old take is replaced. Upload the downloaded file to <b>app4/audio/</b> on GitHub.</p>
+  </main>
+</div>
+<script src="books.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+let cur = 0, recorder = null, chunks = [], stream = null, mp3 = {}, t0 = 0, tick = null, actx = null, analyser = null, raf = null;
+const pad = i => String(i+1).padStart(2,'0');
+const fmt = s => Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+const esc = s => String(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const name = (b,i) => b.title || `Book ${i+1} (empty slot)`;
+
+function renderList(){
+  $('list').innerHTML = BOOKS.map((b,i)=>`<button class="item${i===cur?' sel':''}" data-i="${i}">
+    <span class="n" style="background:${b.color}">${i+1}</span><b class="${b.title?'':'untitled'}">${esc(name(b,i))}</b>
+    <span class="st${mp3[i]?' done':''}">${mp3[i]?'✓ ready':''}</span></button>`).join('');
+}
+function select(i){
+  if(recorder && recorder.state==='recording') return;
+  cur = i; renderList();
+  const b = BOOKS[i];
+  $('title').textContent = (i+1)+'. '+name(b,i);
+  $('text').innerHTML = b.text && b.text.trim()
+    ? b.text.split(/\n\s*\n/).map(p=>'<p>'+esc(p.trim())+'</p>').join('')
+    : `<div class="empty">No text for this book yet. Add it in <code>books.js</code> (slot ${i+1}) — or just record while reading from your own copy.</div>`;
+  $('fname').textContent = pad(i)+'.mp3';
+  const has = mp3[i];
+  $('dlBtn').disabled = !has;
+  $('player').hidden = !has;
+  if(has){ $('player').src = URL.createObjectURL(has); }
+  $('timer').textContent = has ? fmt(has.dur) : '0:00';
+  $('msg').className='msg'; $('msg').textContent = has ? 'Recording ready. Listen back, then download.' : 'Press Record when you are ready.';
+  window.scrollTo(0,0);
+}
+$('list').addEventListener('click', e=>{ const b=e.target.closest('.item'); if(b) select(+b.dataset.i); });
+
+async function start(){
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+  }catch(err){
+    $('msg').className='msg err';
+    $('msg').textContent='No microphone access. Allow it in browser settings (icon left of the address bar) and try again.';
+    return;
+  }
+  chunks = [];
+  recorder = new MediaRecorder(stream);
+  recorder.ondataavailable = e => { if(e.data.size) chunks.push(e.data); };
+  recorder.onstop = finish;
+  recorder.start();
+  t0 = Date.now();
+  tick = setInterval(()=>{ $('timer').textContent = fmt((Date.now()-t0)/1000); }, 250);
+  actx = new (window.AudioContext||window.webkitAudioContext)();
+  analyser = actx.createAnalyser(); analyser.fftSize = 512;
+  actx.createMediaStreamSource(stream).connect(analyser);
+  const buf = new Uint8Array(analyser.fftSize);
+  const loop = ()=>{ analyser.getByteTimeDomainData(buf); let m=0; for(const v of buf) m=Math.max(m,Math.abs(v-128)); $('level').style.width=Math.min(100,m/1.1)+'%'; raf=requestAnimationFrame(loop); };
+  loop();
+  document.body.classList.add('recording');
+  $('recLabel').textContent='Stop'; $('dlBtn').disabled=true; $('player').hidden=true;
+  $('msg').className='msg'; $('msg').textContent='Recording… read the text below.';
+}
+function stop(){ if(recorder && recorder.state==='recording') recorder.stop(); }
+
+async function finish(){
+  clearInterval(tick); cancelAnimationFrame(raf); $('level').style.width='0';
+  stream.getTracks().forEach(t=>t.stop());
+  document.body.classList.remove('recording'); $('recLabel').textContent='Record again';
+  $('msg').textContent='Making MP3…';
+  try{
+    const raw = new Blob(chunks,{type:recorder.mimeType});
+    const ab = await raw.arrayBuffer();
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const audio = await ctx.decodeAudioData(ab);
+    const blob = encodeMp3(audio);
+    blob.dur = audio.duration;
+    mp3[cur] = blob;
+    if(actx) actx.close();
+    select(cur);
+    $('msg').textContent='Recording ready: '+fmt(audio.duration)+'. Listen back and press Download.';
+  }catch(err){
+    $('msg').className='msg err'; $('msg').textContent='Could not process the recording. Try again, or use Chrome.';
+  }
+}
+
+function encodeMp3(audio){
+  const rate = audio.sampleRate;
+  const ch0 = audio.getChannelData(0), ch1 = audio.numberOfChannels>1 ? audio.getChannelData(1) : null;
+  const n = ch0.length, pcm = new Int16Array(n);
+  for(let i=0;i<n;i++){ let v = ch1 ? (ch0[i]+ch1[i])/2 : ch0[i]; v = Math.max(-1,Math.min(1,v)); pcm[i] = v<0 ? v*0x8000 : v*0x7FFF; }
+  const enc = new lamejs.Mp3Encoder(1, rate, 96);
+  const out = [], block = 1152;
+  for(let i=0;i<n;i+=block){ const b = enc.encodeBuffer(pcm.subarray(i,i+block)); if(b.length) out.push(new Uint8Array(b)); }
+  const end = enc.flush(); if(end.length) out.push(new Uint8Array(end));
+  return new Blob(out,{type:'audio/mpeg'});
+}
+
+$('recBtn').onclick = ()=> (recorder && recorder.state==='recording') ? stop() : start();
+$('dlBtn').onclick = ()=>{
+  const b = mp3[cur]; if(!b) return;
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = pad(cur)+'.mp3';
+  document.body.appendChild(a); a.click(); a.remove();
+};
+let fs = 24;
+try{ fs = +localStorage.getItem('anna-rec-fs') || 24; }catch(e){}
+const setFs = v => { fs = Math.max(16,Math.min(40,v)); document.documentElement.style.setProperty('--fs', fs+'px'); try{localStorage.setItem('anna-rec-fs',fs)}catch(e){} };
+$('smaller').onclick = ()=>setFs(fs-2); $('bigger').onclick = ()=>setFs(fs+2);
+setFs(fs);
+if(!window.MediaRecorder || !navigator.mediaDevices){ $('msg').className='msg err'; $('msg').textContent='This browser cannot record audio. Open the page in Chrome or Safari on a computer.'; $('recBtn').disabled=true; }
+if(!window.lamejs){ $('msg').className='msg err'; $('msg').textContent='MP3 module did not load. Refresh the page.'; }
+renderList(); select(0);
+</script>
+</body>
+</html>
